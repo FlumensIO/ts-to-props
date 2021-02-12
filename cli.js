@@ -6,16 +6,14 @@ const replace = require("replace-in-file");
 const [, , ...args] = process.argv;
 
 const [dir] = args;
-
 if (!dir) {
   throw new Error("Please provide the directory");
 }
 
 const inputPattern = `${dir}/*.d.ts`;
-console.log(inputPattern);
 
 generate({
-  tsConfig: "./tsconfig.json",
+  tsConfig: `${__dirname}/tsconfig.json`,
   prettierConfig: "package.json",
   inputPattern,
 })
@@ -29,4 +27,5 @@ generate({
   )
   .then(() => {
     console.log("Done 🚀 ");
-  });
+  })
+  .catch(console.log);
