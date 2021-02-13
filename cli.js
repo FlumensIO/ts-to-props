@@ -21,8 +21,25 @@ generate({
     replace.sync({
       files: [`${dir}/*.d.js`],
 
+      from: "import PropTypes from 'prop-types';",
+      to:
+        "import PropTypes from 'prop-types';\nimport exact from 'prop-types-exact';",
+    })
+  )
+  .then(() =>
+    replace.sync({
+      files: [`${dir}/*.d.js`],
+
       from: "export const propTypes = {",
-      to: "export default {",
+      to: "export default exact({",
+    })
+  )
+  .then(() =>
+    replace.sync({
+      files: [`${dir}/*.d.js`],
+
+      from: "};",
+      to: "});",
     })
   )
   .then(() => {
