@@ -1,25 +1,32 @@
 #!/usr/bin/env node
 
+const fs = require("fs");
 const generate = require("typescript-proptypes-generator").default;
 const replace = require("replace-in-file");
 
 const [, , ...args] = process.argv;
 
-const [dir] = args;
-if (!dir) {
-  throw new Error("Please provide the directory");
+const [source, dest] = args;
+if (!source) {
+  throw new Error("Please provide the source");
 }
 
-const inputPattern = `${dir}/*.d.ts`;
+if (!dest) {
+  throw new Error("Please provide the destination");
+}
 
 generate({
   tsConfig: `${__dirname}/tsconfig.json`,
   prettierConfig: "package.json",
-  inputPattern,
+  inputPattern: source,
 })
+  .then(() => {
+    const tempFileName = source.replace(".ts", ".js");
+    fs.renameSync(tempFileName, dest);
+  })
   .then(() =>
     replace.sync({
-      files: [`${dir}/*.d.js`],
+      files: [dest],
 
       from: "import PropTypes from 'prop-types';",
       to:
@@ -28,7 +35,7 @@ generate({
   )
   .then(() =>
     replace.sync({
-      files: [`${dir}/*.d.js`],
+      files: [dest],
 
       from: "export const propTypes = {",
       to: "export default exact({",
@@ -36,7 +43,7 @@ generate({
   )
   .then(() =>
     replace.sync({
-      files: [`${dir}/*.d.js`],
+      files: [dest],
 
       from: "};",
       to: "});",

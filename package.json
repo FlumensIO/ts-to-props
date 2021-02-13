@@ -1,6 +1,6 @@
 {
   "name": "@flumens/ts-to-props",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "description": "TypeScript to PropTypes",
   "main": "cli.js",
   "scripts": {
