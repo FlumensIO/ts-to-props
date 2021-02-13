@@ -6,17 +6,25 @@ const replace = require("replace-in-file");
 
 const [, , ...args] = process.argv;
 
-const [source, dest] = args;
-if (!source) {
-  throw new Error("Please provide the source");
+let [source, dest] = args;
+if (!source || !source.includes(".d.ts")) {
+  throw new Error("Please provide the source index.d.ts");
 }
 
 if (!dest) {
-  throw new Error("Please provide the destination");
+  dest = source.split("/");
+  dest.pop();
+  dest = dest.join("/") + "/propTypes.js";
 }
 
+const tsConfig = `${__dirname}/tsconfig.json`;
+
+const config = require(tsConfig);
+config.include = [process.env.PWD];
+require("fs").writeFileSync(tsConfig, JSON.stringify(config));
+
 generate({
-  tsConfig: `${__dirname}/tsconfig.json`,
+  tsConfig,
   prettierConfig: "package.json",
   inputPattern: source,
 })
@@ -50,6 +58,7 @@ generate({
     })
   )
   .then(() => {
-    console.log("Done 🚀 ");
+    console.log(`⚙️ ${dest}`);
+    console.log(`🚀 Done!`);
   })
-  .catch(console.log);
+  .catch(console.error);
